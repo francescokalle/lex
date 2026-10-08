@@ -202,6 +202,9 @@ func (s *Service) GetArticle(_ context.Context, in *ArticleIn) (ArticleOut, erro
 	if err != nil {
 		return ArticleOut{}, err
 	}
+	if a.Expression == nil {
+		return ArticleOut{}, fmt.Errorf("act %q has no expression", in.ActURI)
+	}
 	for _, art := range a.Expression.Articles {
 		if art.Number == in.Number {
 			return ArticleOut{Article: ArticleView(art)}, nil

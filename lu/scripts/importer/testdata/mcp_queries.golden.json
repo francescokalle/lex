@@ -32,7 +32,7 @@
         "uri": "https://lex.dev/eli/lu/arrete/1854/etat%2Fadm%2Fa%2F1854%2F04%2F24%2Fn1%2Fjo/1854-04-24/fr",
         "act_uri": "https://lex.dev/eli/lu/arrete/1854/etat%2Fadm%2Fa%2F1854%2F04%2F24%2Fn1%2Fjo",
         "kind": "title",
-        "snippet": "…des hommes de la levée de la [milice] de 1854."
+        "snippet": "…[milice]…"
       }
     ]
   },
@@ -42,7 +42,7 @@
         "uri": "https://lex.dev/eli/lu/arrete/1854/etat%2Fadm%2Fa%2F1854%2F04%2F21%2Fn1%2Fjo/1854-04-21/fr",
         "act_uri": "https://lex.dev/eli/lu/arrete/1854/etat%2Fadm%2Fa%2F1854%2F04%2F21%2Fn1%2Fjo",
         "kind": "title",
-        "snippet": "[Publication] du 21 avril 1854 de la liste…"
+        "snippet": "[Publication]…"
       }
     ]
   }

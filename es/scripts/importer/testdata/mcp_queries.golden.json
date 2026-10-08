@@ -60,7 +60,7 @@
         "uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945/2026-05-27/es/art_df",
         "act_uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945",
         "kind": "article",
-        "snippet": "[Disposición] final primera [Disposición] final primera. Título competencial.…"
+        "snippet": "[Disposición] final primera [Disposición]…"
       }
     ]
   },
@@ -70,7 +70,7 @@
         "uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945/2026-05-27/es",
         "act_uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945",
         "kind": "title",
-        "snippet": "…Ley 20/2011, de 21 de julio, del [Registro] Civil."
+        "snippet": "…[Registro]…"
       }
     ]
   }

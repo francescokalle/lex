@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>lex — open legislation as an MCP knowledge graph</title>
 <meta name="description" content="lex is an open-source, self-hosted MCP server that puts a country's laws and subordinate legislation at an AI assistant's fingertips — searchable in plain language, retrievable with its as-of date, linked as a graph. 12 jurisdictions; Ukraine live.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+<meta property="og:title" content="lex — open legislation as an MCP knowledge graph">
+<meta property="og:description" content="Open-source MCP server that puts a country's laws at your AI assistant's fingertips. Searchable, retrievable, linked as a graph. Self-hosted.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://github.com/tggo/lex">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0c0d11">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -240,18 +247,18 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
     <p class="body dim" style="margin-top:26px">Country-agnostic by design — 11 more jurisdictions
       are scaffolded (importer + golden tests), with prebuilt datasets rolling out on Releases:</p>
     <div class="jur">
-      <div class="jc"><div class="f">🇯🇵</div><div class="n">Japan</div></div>
-      <div class="jc"><div class="f">🇵🇱</div><div class="n">Poland</div></div>
-      <div class="jc"><div class="f">🇬🇧</div><div class="n">UK</div></div>
-      <div class="jc"><div class="f">🇺🇸</div><div class="n">USA</div></div>
-      <div class="jc"><div class="f">🇫🇷</div><div class="n">France</div></div>
-      <div class="jc"><div class="f">🇪🇸</div><div class="n">Spain</div></div>
-      <div class="jc"><div class="f">🇮🇪</div><div class="n">Ireland</div></div>
-      <div class="jc"><div class="f">🇨🇭</div><div class="n">Switzerland</div></div>
-      <div class="jc"><div class="f">🇫🇮</div><div class="n">Finland</div></div>
-      <div class="jc"><div class="f">🇱🇺</div><div class="n">Luxembourg</div></div>
-      <div class="jc"><div class="f">🇦🇺</div><div class="n">Australia</div></div>
-      <div class="jc add"><div class="f">➕</div><div class="n">yours</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Japan flag">🇯🇵</div><div class="n">Japan</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Poland flag">🇵🇱</div><div class="n">Poland</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="UK flag">🇬🇧</div><div class="n">UK</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="USA flag">🇺🇸</div><div class="n">USA</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="France flag">🇫🇷</div><div class="n">France</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Spain flag">🇪🇸</div><div class="n">Spain</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Ireland flag">🇮🇪</div><div class="n">Ireland</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Switzerland flag">🇨🇭</div><div class="n">Switzerland</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Finland flag">🇫🇮</div><div class="n">Finland</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Luxembourg flag">🇱🇺</div><div class="n">Luxembourg</div></div>
+      <div class="jc"><div class="f" role="img" aria-label="Australia flag">🇦🇺</div><div class="n">Australia</div></div>
+      <div class="jc add"><div class="f" role="img" aria-label="Add your country">➕</div><div class="n">yours</div></div>
     </div>
   </section>
 
@@ -278,24 +285,34 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
 
 <script>
 (function(){
-  var c=document.getElementById('graph'),x=c.getContext('2d'),N=[],W,H,DPR;
+  var c=document.getElementById('graph'),x=c.getContext('2d'),N=[],W,H,DPR,running=false;
   var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   function size(){DPR=Math.min(devicePixelRatio||1,2);W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;}
   function init(){size();N=[];var n=Math.min(64,Math.floor(innerWidth/22));
-    for(var i=0;i<n;i++)N.push({x:Math.random()*W,y:Math.random()*H,
+    for(var i=0;i<n;i++)N.push({x:Math.random()*W,y:Math.random*H,
       vx:(Math.random()-.5)*.12*DPR,vy:(Math.random()-.5)*.12*DPR,r:(Math.random()*1.6+.7)*DPR});}
   function step(){
+    if(!running)return;
     x.clearRect(0,0,W,H);
     for(var i=0;i<N.length;i++){var a=N[i];a.x+=a.vx;a.y+=a.vy;
       if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1;
-      for(var j=i+1;j<N.length;j++){var b=N[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy),m=170*DPR;
+      for(var j=i+1;j<N.length;j++){var b=N[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy),m=170*DPR;
         if(d<m){x.strokeStyle='rgba(205,163,73,'+(0.10*(1-d/m))+')';x.lineWidth=DPR*.6;
           x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}}
       x.fillStyle='rgba(231,200,120,.55)';x.beginPath();x.arc(a.x,a.y,a.r,0,7);x.fill();}
     requestAnimationFrame(step);
   }
-  addEventListener('resize',init);init();
-  if(!reduce)step();
+  function start(){if(!running&&!reduce){running=true;requestAnimationFrame(step);}}
+  function stop(){running=false;}
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden)stop();else start();
+  });
+  var resizeTimer;
+  addEventListener('resize',function(){
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(function(){size();},100);
+  });
+  init();start();
 })();
 </script>
 </body>

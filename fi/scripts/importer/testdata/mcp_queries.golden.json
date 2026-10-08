@@ -149,13 +149,13 @@
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_1",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…arvosta muu kuin kiinteä omaisuus muodostaa pääosan. [Etuosto] käsittää samalla kauppakirjalla myydyn kiinteän ja irtaimen…"
+        "snippet": "…[Etuosto]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_7",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…liittyvien velvoitteiden täyttämisestä myyjälle siihen asti, kun [etuosto] on saatettu päätökseen. Kun etuosto-oikeuden käyttämistä koskeva…"
+        "snippet": "…[etuosto]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_12",
@@ -167,13 +167,13 @@
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_9",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…lainhuuto- ja kiinnitysrekisteriin. Merkinnät on poistettava, kun [etuosto] on saatettu loppuun."
+        "snippet": "…[etuosto]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_10",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…oikeus saada korvaus suorituksista ja kustannuksista Kun [etuosto] on saatettu loppuun, valtion on viipymättä korvattava…"
+        "snippet": "…[etuosto]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_8",
@@ -189,7 +189,7 @@
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "title",
-        "snippet": "Laki [valtion] etuosto-oikeudesta eräillä alueilla"
+        "snippet": "…[valtion]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_8",
@@ -201,19 +201,19 @@
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_2",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…§ Etuosto-oikeuden alueellinen soveltamisala Alueista, jotka kuuluvat [valtion] etuosto-oikeuden soveltamisalaan, voidaan säätää tarkemmin valtioneuvoston asetuksella.…"
+        "snippet": "…[valtion]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_10",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…ja kustannuksista Kun etuosto on saatettu loppuun, [valtion] on viipymättä korvattava ostajalle 8 §:ssä tarkoitetut…"
+        "snippet": "…[valtion] on viipymättä korvattava ostajalle 8 §:ssä tarkoitetut suoritukset tämän mahdollisesta laiminlyönnistä aiheutuneita suorituksia lukuun ottamatta. Lisäksi [valtion]…"
       },
       {
         "uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469/2022-12-20/fi/art_12",
         "act_uri": "https://lex.dev/eli/fi/laki/2019/2019%2F469",
         "kind": "article",
-        "snippet": "…ettei se käytä etuosto-oikeuttaan. Aika, jonka kuluessa [valtion] on lainhuudatettava etuostolla hankittu kiinteistö, luetaan siitä,…"
+        "snippet": "…[valtion]…"
       }
     ]
   }

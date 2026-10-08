@@ -51,7 +51,7 @@
         "uri": "https://lex.dev/eli/us/usc-title/2024/title-1/2024-01-08/en/art_1",
         "act_uri": "https://lex.dev/eli/us/usc-title/2024/title-1",
         "kind": "article",
-        "snippet": "…determining the meaning of any Act of [Congress,] unless the context indicates otherwise— words importing…"
+        "snippet": "…[Congress,]…"
       }
     ]
   },
@@ -61,7 +61,7 @@
         "uri": "https://lex.dev/eli/us/usc-title/2024/title-1/2024-01-08/en",
         "act_uri": "https://lex.dev/eli/us/usc-title/2024/title-1",
         "kind": "title",
-        "snippet": "Title 1 - General [Provisions]"
+        "snippet": "…[Provisions]"
       }
     ]
   }

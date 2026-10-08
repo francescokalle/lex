@@ -48,7 +48,7 @@
         "uri": "https://lex.dev/eli/fr/code/1804/LEGITEXT000006070721/2024-07-01/fr",
         "act_uri": "https://lex.dev/eli/fr/code/1804/LEGITEXT000006070721",
         "kind": "title",
-        "snippet": "Code [civil]"
+        "snippet": "…[civil]"
       }
     ]
   },
@@ -58,7 +58,7 @@
         "uri": "https://lex.dev/eli/fr/code/1804/LEGITEXT000006070721/2024-07-01/fr/art_1",
         "act_uri": "https://lex.dev/eli/fr/code/1804/LEGITEXT000006070721",
         "kind": "article",
-        "snippet": "…République française, les actes administratifs entrent en [vigueur] à la date qu'ils fixent ou, à…"
+        "snippet": "…[vigueur]…"
       }
     ]
   }

@@ -63,13 +63,13 @@
         "uri": "https://lex.dev/eli/uk/ukpga/2023/57/2023-12-18/en",
         "act_uri": "https://lex.dev/eli/uk/ukpga/2023/57",
         "kind": "title",
-        "snippet": "National [Insurance] Contributions (Reduction in Rates) Act 2023"
+        "snippet": "…[Insurance]…"
       },
       {
         "uri": "https://lex.dev/eli/uk/ukpga/2023/57/2023-12-18/en/art_5",
         "act_uri": "https://lex.dev/eli/uk/ukpga/2023/57",
         "kind": "article",
-        "snippet": "…Act may be cited as the National [Insurance] Contributions (Reduction in Rates) Act 2023."
+        "snippet": "…[Insurance]…"
       }
     ]
   },
@@ -79,7 +79,7 @@
         "uri": "https://lex.dev/eli/uk/ukpga/2023/57/2023-12-18/en/art_1",
         "act_uri": "https://lex.dev/eli/uk/ukpga/2023/57",
         "kind": "article",
-        "snippet": "…“12 per cent” substitute “10%”. 3 In [regulation] 131 of the Social Security (Contributions) Regulations…"
+        "snippet": "…[regulation]…"
       }
     ]
   }

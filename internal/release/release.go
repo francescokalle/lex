@@ -68,6 +68,9 @@ func ExtractTarGz(r io.Reader, dest string) error {
 		if strings.HasPrefix(filepath.Base(hdr.Name), "._") {
 			continue
 		}
+		if filepath.IsAbs(hdr.Name) || strings.HasPrefix(hdr.Name, "..") {
+			return fmt.Errorf("release: unsafe path in archive: %q", hdr.Name)
+		}
 		target := filepath.Join(cleanDest, hdr.Name)
 		if target != cleanDest && !strings.HasPrefix(target, cleanDest+string(os.PathSeparator)) {
 			return fmt.Errorf("release: unsafe path in archive: %q", hdr.Name)

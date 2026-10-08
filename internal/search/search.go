@@ -217,22 +217,35 @@ func toMatch(stems []string) string {
 	return strings.Join(q, " ")
 }
 
-// snippet builds an excerpt around the first matching word, highlighting the
-// original (inflected) forms whose stem the query matched. Done in Go because
-// the indexed column holds stems, not the original text.
+// snippet builds an excerpt around matching words, highlighting the original
+// (inflected) forms whose stem the query matched. Done in Go because the indexed
+// column holds stems, not the original text. If multiple words match, the snippet
+// spans from the first to the last match (capped at window*2 words) so all
+// highlights are visible.
 func (i *Index) snippet(text string, wantStems map[string]bool, window int) string {
 	words := strings.Fields(text)
-	hit := -1
+	if len(words) == 0 {
+		return ""
+	}
+	matchIdx := make([]int, 0, len(words))
 	for n, w := range words {
 		if wantStems[i.stem.Stem(strings.ToLower(strings.Trim(w, ".,;:()[]«»\"'")))] {
-			hit = n
-			break
+			matchIdx = append(matchIdx, n)
 		}
 	}
 	start, end := 0, len(words)
-	if hit >= 0 {
-		start = max(0, hit-window/2)
-		end = min(len(words), hit+window/2+1)
+	if len(matchIdx) > 0 {
+		first, last := matchIdx[0], matchIdx[len(matchIdx)-1]
+		// Span from first to last match, capped at window*2 words total.
+		span := last - first + 1
+		if span > window*2 {
+			// Too many matches — center on the first match.
+			start = max(0, first-window/2)
+			end = min(len(words), first+window/2+1)
+		} else {
+			start = first
+			end = last + 1
+		}
 	} else if len(words) > window {
 		end = window
 	}

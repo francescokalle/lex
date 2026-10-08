@@ -14,7 +14,7 @@ import (
 // headingRe matches an article heading paragraph like "Стаття 1. Визначення
 // термінів". Group 1 is the article number (e.g. "1", "1-1"); group 2 is the
 // heading's title text, if any.
-var headingRe = regexp.MustCompile(`^Стаття\s+([^\s.]+)\.?\s*(.*)$`)
+var headingRe = regexp.MustCompile(`^Стаття\s+([\d-]+)\.?\s*(.*)$`)
 
 // ParseArticles extracts article structure from an act's HTML body (the
 // data.rada.gov.ua `text/d<dokid>.htm` format). Each "Стаття N" heading starts

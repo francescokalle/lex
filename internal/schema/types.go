@@ -150,9 +150,12 @@ func ArticleURI(expressionURI, number string) string {
 }
 
 func itoa(i int) string {
-	// small, allocation-light int->string for non-negative years
 	if i == 0 {
 		return "0"
+	}
+	// Handle MinInt specially: -MinInt overflows.
+	if i == -i {
+		return strconv.Itoa(i)
 	}
 	neg := i < 0
 	if neg {

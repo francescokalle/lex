@@ -152,7 +152,11 @@ func fetchBody(ctx context.Context, cfg Config, file, versionTag string) ([]byte
 	}
 	cachePath := filepath.Join(cfg.CacheDir, file+"@"+versionTag)
 	if b, err := os.ReadFile(cachePath); err == nil {
-		return b, nil // cache hit — no network
+		if len(b) > 0 {
+			return b, nil // cache hit — no network
+		}
+		// Empty cache file (e.g. from a failed download): delete and re-fetch.
+		_ = os.Remove(cachePath)
 	}
 	b, err := fetch(ctx, cfg, "/perv/text/"+file)
 	if err != nil {
