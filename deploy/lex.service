@@ -1,0 +1,26 @@
+[Unit]
+Description=lex — open legislation MCP server
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lex
+Group=lex
+WorkingDirectory=/opt/lex
+ExecStart=/opt/lex/lex -data /var/lib/lex/data
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/lex/data
+PrivateTmp=true
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

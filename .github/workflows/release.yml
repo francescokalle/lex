@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: Build ${{ matrix.goos }}/${{ matrix.goarch }}
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          version="${GITHUB_REF_NAME}"
+          output="lex-${version}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          go build -ldflags="-s -w -X main.version=${version}" -o "${output}" ./cmd/lex
+          sha256sum "${output}" > "${output}.sha256"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: |
+            lex-*-${{ matrix.goos }}-${{ matrix.goarch }}
+            lex-*-${{ matrix.goos }}-${{ matrix.goarch }}.sha256
+          if-no-files-found: error
+
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME}"
+          notes=$(cat <<'EOF'
+          ## Binaries
+
+          | Platform | Arch | File |
+          |----------|------|------|
+          | Linux | amd64 | lex-${version}-linux-amd64 |
+          | Linux | arm64 | lex-${version}-linux-arm64 |
+          | macOS | amd64 | lex-${version}-darwin-amd64 |
+          | macOS | arm64 | lex-${version}-darwin-arm64 |
+
+          Each binary includes a `.sha256` checksum file.
+
+          ## Install
+
+          ```bash
+          # Linux/macOS
+          curl -LO https://github.com/${{ github.repository }}/releases/download/${version}/lex-${version}-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)
+          chmod +x lex-${version}-*
+          sudo mv lex-${version}-* /usr/local/bin/lex
+          ```
+          EOF
+          )
+          gh release create "${version}" \
+            --title "${version}" \
+            --notes "${notes}" \
+            dist/lex-*

@@ -1,11 +1,11 @@
 name: Rebuild datasets
 
-# Rebuild prebuilt datasets from the official sources once a month and publish
+# Rebuild prebuilt datasets from the official sources once a week and publish
 # them to the fixed `datasets` release, so `lex` users pull ready data instead
 # of scraping (see ADR-0029). Also runnable on demand.
 on:
   schedule:
-    - cron: "0 3 1 * *" # 03:00 UTC on the 1st of each month
+    - cron: "0 3 * * 0" # 03:00 UTC every Sunday
   workflow_dispatch:
 
 permissions:
@@ -38,11 +38,281 @@ jobs:
         run: |
           gh release view datasets >/dev/null 2>&1 || \
             gh release create datasets --title "Prebuilt datasets" --latest=false \
-              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt monthly."
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
           gh release upload datasets \
             "lex-ua.tar.gz#lex-ua.tar.gz (Ukraine — articles + relations)" --clobber
 
-  # To add a country, copy the `ukraine` job: its importer must accept
-  # `-out <cc>/data` and produce <cc>/data/{graph,index.fts}, then package and
-  # upload as `lex-<cc>.tar.gz`. (Align jp/pl/... to the dataset-root layout
-  # first — see docs/TODO.md.)
+  france:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build France dataset
+        run: go run ./fr/scripts/import -out fr/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C fr/data -czf lex-fr.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-fr.tar.gz#lex-fr.tar.gz (France — articles)" --clobber
+
+  united-states:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build US dataset
+        run: go run ./us/scripts/import -out us/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C us/data -czf lex-us.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-us.tar.gz#lex-us.tar.gz (United States — articles)" --clobber
+
+  luxembourg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Luxembourg dataset
+        run: go run ./lu/scripts/import -out lu/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C lu/data -czf lex-lu.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-lu.tar.gz#lex-lu.tar.gz (Luxembourg — articles)" --clobber
+
+  poland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Poland dataset
+        run: go run ./pl/scripts/import -out pl/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C pl/data -czf lex-pl.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-pl.tar.gz#lex-pl.tar.gz (Poland — articles)" --clobber
+
+  japan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Japan dataset
+        run: go run ./jp/scripts/import -out jp/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C jp/data -czf lex-jp.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-jp.tar.gz#lex-jp.tar.gz (Japan — articles)" --clobber
+
+  ireland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Ireland dataset
+        run: go run ./ie/scripts/import -out ie/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C ie/data -czf lex-ie.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-ie.tar.gz#lex-ie.tar.gz (Ireland — articles)" --clobber
+
+  spain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Spain dataset
+        run: go run ./es/scripts/import -out es/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C es/data -czf lex-es.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-es.tar.gz#lex-es.tar.gz (Spain — articles)" --clobber
+
+  finland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Finland dataset
+        run: go run ./fi/scripts/import -out fi/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C fi/data -czf lex-fi.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-fi.tar.gz#lex-fi.tar.gz (Finland — articles)" --clobber
+
+  australia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Australia dataset
+        run: go run ./au/scripts/import -out au/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C au/data -czf lex-au.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-au.tar.gz#lex-au.tar.gz (Australia — articles)" --clobber
+
+  switzerland:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build Switzerland dataset
+        run: go run ./ch/scripts/import -out ch/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C ch/data -czf lex-ch.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-ch.tar.gz#lex-ch.tar.gz (Switzerland — articles)" --clobber
+
+  united-kingdom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Build UK dataset
+        run: go run ./uk/scripts/import -out uk/data -articles -delay 150ms
+
+      - name: Package
+        run: tar --no-xattrs -C uk/data -czf lex-uk.tar.gz graph index.fts
+
+      - name: Publish to the datasets release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view datasets >/dev/null 2>&1 || \
+            gh release create datasets --title "Prebuilt datasets" --latest=false \
+              --notes "Prebuilt lex datasets (graph + full-text index). Rebuilt weekly."
+          gh release upload datasets \
+            "lex-uk.tar.gz#lex-uk.tar.gz (United Kingdom — articles)" --clobber
