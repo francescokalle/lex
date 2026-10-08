@@ -29,11 +29,30 @@ const (
 	langAlpha3 = "ENG"
 )
 
-// Document is the root <uslm> element of a US Code title file.
+// Document is the root element of a US Code title file. The OLRC publishes
+// per-title files with root <uscDoc> (namespace http://xml.house.gov/schemas/uslm/1.0);
+// we also accept <uslm> for backward compatibility with the test fixture.
 type Document struct {
-	XMLName xml.Name `xml:"uslm"`
+	XMLName xml.Name `xml:"-"`
 	Meta    Meta     `xml:"meta"`
 	Main    Main     `xml:"main"`
+}
+
+// UnmarshalXML implements custom unmarshaling to accept both <uscDoc> and
+// <uslm> root elements.
+func (d *Document) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+	d.XMLName = start.Name
+	type documentFields struct {
+		Meta Meta `xml:"meta"`
+		Main Main `xml:"main"`
+	}
+	var fields documentFields
+	if err := dec.DecodeElement(&fields, &start); err != nil {
+		return err
+	}
+	d.Meta = fields.Meta
+	d.Main = fields.Main
+	return nil
 }
 
 // Meta is the <meta> block carrying publication metadata.
@@ -89,14 +108,15 @@ type Content struct {
 	Inner string `xml:",innerxml"`
 }
 
-// ParseDocument decodes a USLM per-title XML file.
+// ParseDocument decodes a USLM per-title XML file. Accepts both <uscDoc>
+// (the OLRC's published root element) and <uslm> (test fixture).
 func ParseDocument(b []byte) (*Document, error) {
 	var d Document
 	if err := xml.Unmarshal(b, &d); err != nil {
 		return nil, fmt.Errorf("uslm: parse document: %w", err)
 	}
-	if d.XMLName.Local != "uslm" {
-		return nil, fmt.Errorf("uslm: root element is %q, want uslm", d.XMLName.Local)
+	if d.XMLName.Local != "uscDoc" && d.XMLName.Local != "uslm" {
+		return nil, fmt.Errorf("uslm: root element is %q, want uscDoc or uslm", d.XMLName.Local)
 	}
 	return &d, nil
 }
