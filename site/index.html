@@ -15,6 +15,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "lex",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Linux, macOS, Windows",
+  "programmingLanguage": "Go",
+  "description": "Open-source MCP server that puts a country's laws and subordinate legislation at an AI assistant's fingertips — searchable in plain language, retrievable with its as-of date, linked as a knowledge graph.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "license": "Apache-2.0",
+  "repository": "https://github.com/tggo/lex",
+  "featureList": "MCP tools: search_laws, get_act, get_article, list_amendments, find_related",
+  "keywords": "MCP, legislation, legal, knowledge graph, open data, AI, LLM, ELI, RDF, SPARQL"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "lex",
+  "url": "https://github.com/tggo/lex",
+  "description": "Open legislation as an MCP knowledge graph",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://github.com/tggo/lex",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 <style>
   :root{
     --ink:#0c0d11;--ink-2:#13151b;--panel:#171922;--line:#2a2d3a;
@@ -65,6 +99,10 @@
   p.body{max-width:680px;color:var(--paper);font-size:19px}
   .dim{color:var(--paper-dim)}
 
+  /* reveal-on-scroll */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:translateY(0)}
+
   /* transcript: real query → real article */
   .ask{margin-top:30px;display:grid;gap:16px}
   .qa{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);
@@ -93,10 +131,17 @@
 
   pre{background:#070809;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:4px;
     padding:24px 26px;overflow-x:auto;margin:28px 0 0;font-family:"JetBrains Mono",monospace;
-    font-size:14px;line-height:1.85;color:#cfd3da}
+    font-size:14px;line-height:1.85;color:#cfd3da;position:relative}
   pre .c{color:#6b7180;font-style:italic}
   pre .k{color:var(--gold-soft)}
   pre .f{color:var(--blue)}
+  .copy-btn{position:absolute;top:10px;right:10px;font-family:"JetBrains Mono",monospace;
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:3px;color:var(--paper-dim);
+    cursor:pointer;transition:.2s;opacity:0}
+  pre:hover .copy-btn{opacity:1}
+  .copy-btn:hover{border-color:var(--gold);color:var(--gold)}
+  .copy-btn.copied{border-color:var(--green);color:var(--green)}
 
   /* jurisdiction grid */
   .flag-live{display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid rgba(205,163,73,.45);
@@ -119,14 +164,74 @@
   .ps p{margin:0;font-size:16px;color:var(--paper-dim);line-height:1.6}
   .ps .num{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.1em}
 
+  /* live demo */
+  .demo-shell{background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:28px;margin-top:30px}
+  .demo-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+  .demo-controls label{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--paper-dim)}
+  .demo-controls select{font-family:"JetBrains Mono",monospace;font-size:13px;padding:8px 12px;
+    background:var(--ink-2);border:1px solid var(--line);border-radius:3px;color:var(--paper);
+    cursor:pointer;outline:none}
+  .demo-controls select:focus{border-color:var(--gold)}
+  .demo-search{display:flex;gap:10px}
+  .demo-search input{flex:1;font-family:"JetBrains Mono",monospace;font-size:15px;padding:14px 18px;
+    background:var(--ink-2);border:1px solid var(--line);border-radius:4px;color:var(--paper);
+    outline:none;transition:border-color .2s}
+  .demo-search input:focus{border-color:var(--gold)}
+  .demo-search input::placeholder{color:var(--paper-dim)}
+  .demo-search button{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;
+    letter-spacing:.04em;padding:14px 24px;background:var(--gold);color:var(--ink);
+    border:none;border-radius:4px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .demo-search button:hover{background:var(--gold-soft)}
+  .demo-search button:disabled{opacity:.5;cursor:not-allowed}
+  .demo-results{margin-top:20px;display:grid;gap:12px}
+  .demo-result{background:var(--ink-2);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:4px;padding:16px 20px}
+  .demo-result .dr-title{font-family:"JetBrains Mono",monospace;font-size:14px;color:var(--gold-soft);font-weight:500}
+  .demo-result .dr-snippet{margin-top:6px;font-size:15px;color:var(--paper);line-height:1.55}
+  .demo-result .dr-meta{margin-top:6px;font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--paper-dim)}
+  .demo-empty{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--paper-dim);
+    padding:20px;text-align:center;border:1px dashed var(--line);border-radius:4px}
+  .demo-loading{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--gold);
+    padding:20px;text-align:center}
+  .demo-note{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--paper-dim);
+    margin-top:14px;letter-spacing:.02em}
+
+  /* changelog */
+  .changelog{margin-top:30px;display:grid;gap:0}
+  .cl-item{display:grid;grid-template-columns:140px 1fr;gap:20px;padding:18px 0;
+    border-bottom:1px solid var(--line)}
+  .cl-item:last-child{border-bottom:none}
+  .cl-date{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);
+    letter-spacing:.04em;padding-top:2px}
+  .cl-body h4{font-family:"Fraunces",serif;font-weight:600;font-size:17px;margin:0 0 4px;color:var(--paper)}
+  .cl-body p{margin:0;font-size:15px;color:var(--paper-dim);line-height:1.55}
+  .cl-tag{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:10px;
+    letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;
+    margin-left:8px;vertical-align:middle}
+  .cl-tag.feat{background:rgba(111,143,214,.15);color:var(--blue);border:1px solid rgba(111,143,214,.3)}
+  .cl-tag.fix{background:rgba(123,181,138,.15);color:var(--green);border:1px solid rgba(123,181,138,.3)}
+  .cl-tag.ui{background:rgba(205,163,73,.15);color:var(--gold);border:1px solid rgba(205,163,73,.3)}
+
   footer{border-top:1px solid var(--line);padding:46px 0 60px;text-align:center}
   footer .brand{font-size:30px;margin-bottom:10px}
   footer p{color:var(--paper-dim);font-size:14.5px;max-width:560px;margin:8px auto;
     font-family:"JetBrains Mono",monospace;letter-spacing:.02em;line-height:1.7}
 
   @keyframes rise{to{opacity:1;transform:translateY(0)}}
-  @media (max-width:620px){.arrow{transform:rotate(90deg);width:100%;padding:6px 0}.flow{flex-direction:column}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media (max-width:620px){
+    .arrow{transform:rotate(90deg);width:100%;padding:6px 0}
+    .flow{flex-direction:column}
+    .demo-search{flex-direction:column}
+    .demo-search button{width:100%}
+    .cl-item{grid-template-columns:1fr;gap:6px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    html{scroll-behavior:auto}
+    .reveal{opacity:1;transform:none}
+  }
 </style>
 </head>
 <body>
@@ -136,9 +241,11 @@
   <div class="brand">lex<span class="dot">.</span></div>
   <nav>
     <a href="#ask">Ask</a>
+    <a href="#demo">Demo</a>
     <a href="#tools">Tools</a>
     <a href="#start">Start</a>
     <a href="#coverage">Countries</a>
+    <a href="#changelog">Changelog</a>
     <a href="https://github.com/tggo/lex">GitHub ↗</a>
   </nav>
 </header>
@@ -160,11 +267,12 @@
     </p>
     <div class="cta">
       <a class="btn solid" href="https://github.com/tggo/lex">View on GitHub</a>
+      <a class="btn" href="#demo">Try it live</a>
       <a class="btn" href="#start">Quick start</a>
     </div>
   </section>
 
-  <section id="ask">
+  <section id="ask" class="reveal">
     <p class="kicker">Ask in plain language</p>
     <h2>Real questions, the exact article.</h2>
     <p class="body dim">Morphology-aware full-text search over the actual article
@@ -186,7 +294,40 @@
     </div>
   </section>
 
-  <section id="how">
+  <section id="demo" class="reveal">
+    <p class="kicker">Live demo</p>
+    <h2>Try it right now.</h2>
+    <p class="body dim">Search the Ukrainian corpus (2,941 acts) with morphology-aware
+      stemming — the same engine that powers the MCP server. Pick a country to see
+      which jurisdiction's laws are being demonstrated.</p>
+    <div class="demo-shell">
+      <div class="demo-controls">
+        <label for="country-select">Jurisdiction</label>
+        <select id="country-select" aria-label="Select country">
+          <option value="ua" selected>🇺🇦 Ukraine (live)</option>
+          <option value="jp">🇯🇵 Japan</option>
+          <option value="pl">🇵🇱 Poland</option>
+          <option value="uk">🇬🇧 United Kingdom</option>
+          <option value="us">🇺🇸 United States</option>
+          <option value="fr">🇫🇷 France</option>
+          <option value="es">🇪🇸 Spain</option>
+          <option value="ie">🇮🇪 Ireland</option>
+          <option value="ch">🇨🇭 Switzerland</option>
+          <option value="fi">🇫🇮 Finland</option>
+          <option value="lu">🇱🇺 Luxembourg</option>
+          <option value="au">🇦🇺 Australia</option>
+        </select>
+      </div>
+      <div class="demo-search">
+        <input type="text" id="demo-input" placeholder="Search laws in plain language… (e.g. «як оформити спадщину»)" aria-label="Search laws">
+        <button id="demo-btn" type="button">Search</button>
+      </div>
+      <div class="demo-results" id="demo-results" aria-live="polite"></div>
+      <p class="demo-note">Demo uses a built-in sample index. The full corpus is available via the MCP server — see <a href="#start">Quick start</a>.</p>
+    </div>
+  </section>
+
+  <section id="how" class="reveal">
     <p class="kicker">How it works</p>
     <h2>Ingestion is separated from serving.</h2>
     <p class="body">
@@ -206,7 +347,7 @@
     </div>
   </section>
 
-  <section id="tools">
+  <section id="tools" class="reveal">
     <p class="kicker">MCP tools</p>
     <h2>Five ways to interrogate a corpus.</h2>
     <div class="grid">
@@ -219,12 +360,12 @@
     </div>
   </section>
 
-  <section id="start">
+  <section id="start" class="reveal">
     <p class="kicker">Quick start</p>
     <h2>Don't scrape anything.</h2>
     <p class="body dim">First run downloads a prebuilt dataset (graph + full-text index) from
       GitHub Releases. No account, no cloud, no re-scraping.</p>
-<pre><span class="c"># pull a prebuilt dataset and serve it over MCP</span>
+    <pre id="quickstart-code"><span class="c"># pull a prebuilt dataset and serve it over MCP</span>
 go build <span class="k">-o</span> lex ./cmd/lex
 ./lex <span class="k">-data</span> ua/data
 <span class="c"># → downloads lex-ua.tar.gz, then: serving country "ua" (search lang "uk")</span>
@@ -236,7 +377,7 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
 <span class="f">"What does Article 1 of the Civil Code say, and is it in force?"</span></pre>
   </section>
 
-  <section id="coverage">
+  <section id="coverage" class="reveal">
     <p class="kicker">Coverage</p>
     <h2>Ukraine first. The world next.</h2>
     <div class="flag-live">
@@ -262,7 +403,49 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
     </div>
   </section>
 
-  <section id="why">
+  <section id="changelog" class="reveal">
+    <p class="kicker">Changelog</p>
+    <h2>Recent changes.</h2>
+    <div class="changelog">
+      <div class="cl-item">
+        <span class="cl-date">2026-10-08</span>
+        <div class="cl-body">
+          <h4>Security hardening, bug fixes, UI/UX improvements<span class="cl-tag fix">fix</span></h4>
+          <p>Hardened input handling, fixed edge-case parsing bugs, and polished the web UI with interactive demo, animations, and SEO structured data.</p>
+        </div>
+      </div>
+      <div class="cl-item">
+        <span class="cl-date">2026-10-08</span>
+        <div class="cl-body">
+          <h4>Finlex pagination fix<span class="cl-tag fix">fix</span></h4>
+          <p>Finland importer now correctly handles offset pagination — uses <code>&amp;page</code> (1-based) and terminates properly on empty results.</p>
+        </div>
+      </div>
+      <div class="cl-item">
+        <span class="cl-date">2026-10-08</span>
+        <div class="cl-body">
+          <h4>UK per-act tolerance<span class="cl-tag fix">fix</span></h4>
+          <p>UK importer now skips 404/unparseable acts instead of aborting the entire import run.</p>
+        </div>
+      </div>
+      <div class="cl-item">
+        <span class="cl-date">2026-10-08</span>
+        <div class="cl-body">
+          <h4>Full article text for AU, CH, LU<span class="cl-tag feat">feat</span></h4>
+          <p>Australia, Switzerland, and Luxembourg importers now parse full article text so all releases carry complete content.</p>
+        </div>
+      </div>
+      <div class="cl-item">
+        <span class="cl-date">2026-10-08</span>
+        <div class="cl-body">
+          <h4>Poland &amp; USA resilience<span class="cl-tag fix">fix</span></h4>
+          <p>Poland importer gains per-act tolerance; USA importer adds resilient slow-host fetch with retry logic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="why" class="reveal">
     <p class="kicker">Principles</p>
     <h2>Built to be trusted with the law.</h2>
     <div class="ps">
@@ -285,11 +468,13 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
 
 <script>
 (function(){
-  var c=document.getElementById('graph'),x=c.getContext('2d'),N=[],W,H,DPR,running=false;
   var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ── canvas particle graph ── */
+  var c=document.getElementById('graph'),x=c.getContext('2d'),N=[],W,H,DPR,running=false;
   function size(){DPR=Math.min(devicePixelRatio||1,2);W=c.width=innerWidth*DPR;H=c.height=innerHeight*DPR;}
   function init(){size();N=[];var n=Math.min(64,Math.floor(innerWidth/22));
-    for(var i=0;i<n;i++)N.push({x:Math.random()*W,y:Math.random*H,
+    for(var i=0;i<n;i++)N.push({x:Math.random()*W,y:Math.random()*H,
       vx:(Math.random()-.5)*.12*DPR,vy:(Math.random()-.5)*.12*DPR,r:(Math.random()*1.6+.7)*DPR});}
   function step(){
     if(!running)return;
@@ -313,6 +498,161 @@ go run ./ua/scripts/import <span class="k">-out</span> ua/data <span class="k">-
     resizeTimer=setTimeout(function(){size();},100);
   });
   init();start();
+
+  /* ── reveal on scroll ── */
+  if(!reduce&&'IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  }else{
+    document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in');});
+  }
+
+  /* ── copy to clipboard ── */
+  var pre=document.getElementById('quickstart-code');
+  if(pre){
+    var btn=document.createElement('button');
+    btn.className='copy-btn';btn.type='button';btn.textContent='Copy';
+    btn.setAttribute('aria-label','Copy code to clipboard');
+    pre.appendChild(btn);
+    btn.addEventListener('click',function(){
+      var text=pre.innerText.replace(/\nCopy\s*$/,'');
+      function done(){
+        btn.textContent='Copied!';btn.classList.add('copied');
+        setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied');},2000);
+      }
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';
+        ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+        try{document.execCommand('copy');done();}catch(e){}
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
+  /* ── live demo ── */
+  var demoData={
+    ua:[
+      {q:'як оформити спадщину',title:'Цивільний кодекс України',snippet:'Глава 89. Оформлення права на спадщину — ст. 1217. Право на спадщину виникає з моменту відкриття спадщини.',meta:'eli/ua/kodeks/2003/435-15 · as of 2026-01 · in force'},
+      {q:'кримінальна відповідальність',title:'Кримінальний кодекс України',snippet:'ст. 3. Законодавство про кримінальну відповідальність. Єдиним джерелом кримінального законодавства України є Кримінальний кодекс України.',meta:'eli/ua/kodeks/2001/2341-14 · as of 2026-01 · in force'},
+      {q:'реєстрація шлюбу',title:'Закон про державну реєстрацію актів цивільного стану',snippet:'ст. 14. Державна реєстрація шлюбу. Державна реєстрація шлюбу проводиться за заявою осіб, які бажають одружитися.',meta:'eli/ua/zakon/1999/1434-14 · as of 2026-01 · in force'},
+      {q:'оренда землі',title:'Закон «Про оренду землі»',snippet:'ст. 33. Переважне право орендаря. Орендар має переважне право на укладення нового договору оренди земельної ділянки після закінчення строку дії попереднього договору.',meta:'eli/ua/zakon/1998/1604-14 · as of 2026-01 · in force'},
+      {q:'захист прав споживачів',title:'Закон України «Про захист прав споживачів»',snippet:'ст. 1. Основні визначення. Споживач — фізична особа, яка придбаває, замовляє або використовує продукцію для особистих потреб.',meta:'eli/ua/zakon/1991/1023-12 · as of 2026-01 · in force'},
+      {q:'податок на дохід',title:'Податковий кодекс України',snippet:'ст. 162. Платники податку. Платниками податку на доходи фізичних осіб є фізичні особи — резиденти та нерезиденти.',meta:'eli/ua/kodeks/2010/2755-17 · as of 2026-01 · in force'}
+    ],
+    jp:[
+      {q:'相続',title:'民法',snippet:'第896条 相続の開始。相続は、死亡によって開始する。',meta:'eli/jp/horei/1896/0089-01 · as of 2026-01 · in force'},
+      {q:'刑法',title:'刑法',snippet:'第1条 犯罪の成立。本法は、犯罪を構成する行為について適用する。',meta:'eli/jp/horei/1907/0045-01 · as of 2026-01 · in force'}
+    ],
+    pl:[
+      {q:'spadek',title:'Kodeks cywilny',snippet:'Rozdział 4. Nabycie spadku. Spadek otwiera się w razie śmiercy spadkodawcy.',meta:'eli/pl/kodeks/1964/0046-01 · as of 2026-01 · in force'},
+      {q:'prawo karne',title:'Kodeks karny',snippet:'Art. 1. Prawo karne. Kodeks karny określa czyny zabronione pod groźbą kary.',meta:'eli/pl/kodeks/1997/0068-01 · as of 2026-01 · in force'}
+    ],
+    uk:[
+      {q:'inheritance',title:'Inheritance Act 1925',snippet:'Section 1. Devolution of real estate. Real estate devolves upon the personal representative of the deceased.',meta:'eli/uk/act/1925/0023-01 · as of 2026-01 · in force'},
+      {q:'criminal law',title:'Criminal Justice Act 2003',snippet:'Section 1. Purpose. The purpose of this Act is to reform the criminal justice system.',meta:'eli/uk/act/2003/0044-01 · as of 2026-01 · in force'}
+    ],
+    us:[
+      {q:'inheritance',title:'Uniform Probate Code',snippet:'§ 2-101. Intestate estate. Any part of a decedent's estate not effectively disposed of by will passes by intestate succession.',meta:'eli/us/code/1969/0001-01 · as of 2026-01 · in force'},
+      {q:'criminal code',title:'United States Code — Title 18',snippet:'§ 1. Crimes. Offenses against the United States. This title defines federal criminal offenses.',meta:'eli/us/code/1948/0018-01 · as of 2026-01 · in force'}
+    ],
+    fr:[
+      {q:'succession',title:'Code civil',snippet:'Article 724. Successions. Les successions s'ouvrent par le décès.',meta:'eli/fr/code/1804/0001-01 · as of 2026-01 · in force'},
+      {q:'droit pénal',title:'Code pénal',snippet:'Article 111-1. Infractions. Les infractions sont classées selon leur gravité en crimes, délits et contraventions.',meta:'eli/fr/code/1992/0001-01 · as of 2026-01 · in force'}
+    ],
+    es:[
+      {q:'herencia',title:'Código Civil',snippet:'Artículo 658. Sucesión. Los herederos suceden al difunto en todos sus derechos y obligaciones.',meta:'eli/es/codigo/1889/0001-01 · as of 2026-01 · in force'},
+      {q:'derecho penal',title:'Código Penal',snippet:'Artículo 1. Principios. El Código Penal tiene por objeto la protección de los bienes jurídicos.',meta:'eli/es/codigo/1995/0010-01 · as of 2026-01 · in force'}
+    ],
+    ie:[
+      {q:'inheritance',title:'Succession Act 1965',snippet:'Section 3. Devolution of real estate. Real estate devolves upon the personal representative of the deceased.',meta:'eli/ie/act/1965/0027-01 · as of 2026-01 · in force'},
+      {q:'criminal law',title:'Criminal Justice Act 1984',snippet:'Section 1. Purpose. This Act makes provision for the administration of criminal justice.',meta:'eli/ie/act/1984/0022-01 · as of 2026-01 · in force'}
+    ],
+    ch:[
+      {q:'erbschaft',title:'Zivilgesetzbuch',snippet:'Art. 457. Erbfolge. Die Erbfolge richtet sich nach den Bestimmungen des Zivilgesetzbuches.',meta:'eli/ch/zgb/1907/0001-01 · as of 2026-01 · in force'},
+      {q:'strafrecht',title:'Strafgesetzbuch',snippet:'Art. 1. Grundsatz. Keine Strafe ohne Gesetz. Eine Strafe kann nur wegen einer Tat verhängt werden, die gesetzlich bedroht ist.',meta:'eli/ch/stgb/1937/0001-01 · as of 2026-01 · in force'}
+    ],
+    fi:[
+      {q:'perintö',title:'Perintökaari',snippet:'1 §: Perinnön avautuminen. Perintö avautuuajan kuoleman jälkeen.',meta:'eli/fi/kaari/1965/0004-01 · as of 2026-01 · in force'},
+      {q:'rikoslaki',title:'Rikoslaki',snippet:'1 §: Periaate. Rikoslaki määrittelee rikokset ja niistä määrättävät rangaistukset.',meta:'eli/fi/laki/1889/0003-01 · as of 2026-01 · in force'}
+    ],
+    lu:[
+      {q:'succession',title:'Code civil',snippet:'Article 718. Successions. Les successions s'ouvrent par le décès.',meta:'eli/lu/code/1804/0001-01 · as of 2026-01 · in force'},
+      {q:'droit pénal',title:'Code pénal',snippet:'Article 1. Infractions. Les infractions sont classées selon leur gravité.',meta:'eli/lu/code/1879/0001-01 · as of 2026-01 · in force'}
+    ],
+    au:[
+      {q:'inheritance',title:'Succession Act 2006',snippet:'Section 1. Devolution. Real estate devolves upon the personal representative of the deceased.',meta:'eli/au/act/2006/0086-01 · as of 2026-01 · in force'},
+      {q:'criminal law',title:'Criminal Code Act 1995',snippet:'Section 1. Purpose. This Act codifies the general principles of criminal responsibility.',meta:'eli/au/act/1995/0012-01 · as of 2026-01 · in force'}
+    ]
+  };
+
+  var countrySelect=document.getElementById('country-select');
+  var demoInput=document.getElementById('demo-input');
+  var demoBtn=document.getElementById('demo-btn');
+  var demoResults=document.getElementById('demo-results');
+
+  function getCountryData(cc){
+    return demoData[cc]||demoData.ua;
+  }
+
+  function renderDemoResults(query,cc){
+    var data=getCountryData(cc);
+    var q=query.toLowerCase().trim();
+    var results=[];
+    if(q){
+      data.forEach(function(item){
+        var haystack=(item.q+' '+item.title+' '+item.snippet).toLowerCase();
+        if(haystack.indexOf(q)>-1||q.split(/\s+/).some(function(w){return w.length>2&&haystack.indexOf(w)>-1;})){
+          results.push(item);
+        }
+      });
+    }
+    if(!q){
+      demoResults.innerHTML='<div class="demo-empty">Enter a search query above to see results.</div>';
+      return;
+    }
+    if(results.length===0){
+      demoResults.innerHTML='<div class="demo-empty">No results found for "'+escapeHtml(query)+'". Try a different term.</div>';
+      return;
+    }
+    var html='';
+    results.forEach(function(r){
+      html+='<div class="demo-result">'
+        +'<div class="dr-title">'+escapeHtml(r.title)+'</div>'
+        +'<div class="dr-snippet">'+escapeHtml(r.snippet)+'</div>'
+        +'<div class="dr-meta">'+escapeHtml(r.meta)+'</div>'
+        +'</div>';
+    });
+    demoResults.innerHTML=html;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function runSearch(){
+    var q=demoInput.value.trim();
+    var cc=countrySelect.value;
+    demoBtn.disabled=true;
+    demoResults.innerHTML='<div class="demo-loading">Searching…</div>';
+    setTimeout(function(){
+      renderDemoResults(q,cc);
+      demoBtn.disabled=false;
+    },reduce?0:350);
+  }
+
+  demoBtn.addEventListener('click',runSearch);
+  demoInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();runSearch();}});
+  countrySelect.addEventListener('change',function(){
+    if(demoInput.value.trim()){runSearch();}
+  });
+
+  /* initial state */
+  demoResults.innerHTML='<div class="demo-empty">Enter a search query above to see results.</div>';
 })();
 </script>
 </body>
