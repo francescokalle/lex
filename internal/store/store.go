@@ -361,6 +361,52 @@ func (s *Store) relTargets(exprURI, pred string) []string {
 	return out
 }
 
+// InverseAmends returns the resource URIs of all acts that amend the given act.
+// It finds expressions with eli:amends pointing to the target URI (either a
+// resource or expression URI), then maps them back to their owning resources.
+func (s *Store) InverseAmends(targetURI string) ([]string, error) {
+	return s.inverseRelations(targetURI, schema.PredAmends)
+}
+
+// InverseRepeals returns the resource URIs of all acts that repeal the given act.
+func (s *Store) InverseRepeals(targetURI string) ([]string, error) {
+	return s.inverseRelations(targetURI, schema.PredRepeals)
+}
+
+// inverseRelations is the shared implementation for InverseAmends/InverseRepeals.
+// It finds all expressions that have the given predicate pointing to targetURI,
+// then resolves them to their owning resource URIs.
+func (s *Store) inverseRelations(targetURI, pred string) ([]string, error) {
+	q := prefixes + fmt.Sprintf(`SELECT DISTINCT ?resource WHERE {
+  ?expr <%s> <%s> .
+  ?resource eli:is_realized_by ?expr .
+}`, pred, targetURI)
+	res, err := sparql.Query(s.g, q)
+	if err != nil {
+		return nil, fmt.Errorf("store: inverse relation query: %w", err)
+	}
+	out := make([]string, 0, len(res.Bindings))
+	for _, row := range res.Bindings {
+		out = append(out, text(row["resource"]))
+	}
+	sort.Strings(out)
+	return out, nil
+}
+
+// GetActs retrieves multiple acts by their resource URIs in a single call.
+// Returns an error if any URI is not found or malformed.
+func (s *Store) GetActs(uris []string) ([]*schema.Act, error) {
+	acts := make([]*schema.Act, 0, len(uris))
+	for _, u := range uris {
+		a, err := s.GetAct(u)
+		if err != nil {
+			return nil, fmt.Errorf("store: GetActs(%q): %w", u, err)
+		}
+		acts = append(acts, a)
+	}
+	return acts, nil
+}
+
 // DumpSorted writes all triples as sorted N-Triples — deterministic output for
 // golden tests.
 func (s *Store) DumpSorted(w io.Writer) error {

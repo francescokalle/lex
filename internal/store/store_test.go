@@ -224,6 +224,315 @@ func TestDumpSorted_golden(t *testing.T) {
 	}
 }
 
+// --- Inverse relation tests ---
+
+func TestInverseAmends_emptyStore(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	got, err := s.InverseAmends(schema.ResourceURI("ua", "kodeks", 2003, "435-15"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected empty result, got %v", got)
+	}
+}
+
+func TestInverseRepeals_emptyStore(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	got, err := s.InverseRepeals(schema.ResourceURI("ua", "kodeks", 2003, "435-15"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected empty result, got %v", got)
+	}
+}
+
+func TestInverseAmends_singleAmender(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	target := sampleAct()
+	if err := s.AddAct(target); err != nil {
+		t.Fatal(err)
+	}
+
+	amender := &schema.Act{
+		Country: "ua", TypeSlug: "zakon", Year: 2024, Number: "123-1",
+		Expression: &schema.Expression{
+			Title:       "Закон про внесення змін",
+			LangTag:     "uk",
+			VersionDate: time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC),
+			Amends:      []string{target.ResourceURI()},
+		},
+	}
+	if err := s.AddAct(amender); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := s.InverseAmends(target.ResourceURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0] != amender.ResourceURI() {
+		t.Errorf("InverseAmends = %v, want [%s]", got, amender.ResourceURI())
+	}
+}
+
+func TestInverseRepeals_singleRepealer(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	target := sampleAct()
+	if err := s.AddAct(target); err != nil {
+		t.Fatal(err)
+	}
+
+	repealer := &schema.Act{
+		Country: "ua", TypeSlug: "zakon", Year: 2025, Number: "456-1",
+		Expression: &schema.Expression{
+			Title:       "Закон про скасування",
+			LangTag:     "uk",
+			VersionDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+			Repeals:     []string{target.ResourceURI()},
+		},
+	}
+	if err := s.AddAct(repealer); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := s.InverseRepeals(target.ResourceURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0] != repealer.ResourceURI() {
+		t.Errorf("InverseRepeals = %v, want [%s]", got, repealer.ResourceURI())
+	}
+}
+
+func TestInverseAmends_multipleAmenders(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	target := sampleAct()
+	if err := s.AddAct(target); err != nil {
+		t.Fatal(err)
+	}
+
+	for i, num := range []string{"100-1", "200-2", "300-3"} {
+		amender := &schema.Act{
+			Country: "ua", TypeSlug: "zakon", Year: 2020 + i, Number: num,
+			Expression: &schema.Expression{
+				Title:       "Закон про внесення змін " + num,
+				LangTag:     "uk",
+				VersionDate: time.Date(2020+i, 1, 1, 0, 0, 0, 0, time.UTC),
+				Amends:      []string{target.ResourceURI()},
+			},
+		}
+		if err := s.AddAct(amender); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got, err := s.InverseAmends(target.ResourceURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 {
+		t.Fatalf("expected 3 amenders, got %d: %v", len(got), got)
+	}
+	// Results must be sorted.
+	for i := 1; i < len(got); i++ {
+		if got[i-1] >= got[i] {
+			t.Errorf("results not sorted: %v", got)
+			break
+		}
+	}
+}
+
+func TestInverseAmends_malformedURI(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	// A malformed URI should not panic or error — just return empty.
+	got, err := s.InverseAmends("not-a-valid-uri")
+	if err != nil {
+		t.Fatalf("unexpected error for malformed URI: %v", err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected empty result for malformed URI, got %v", got)
+	}
+}
+
+func TestInverseAmends_expressionURITarget(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	target := sampleAct()
+	if err := s.AddAct(target); err != nil {
+		t.Fatal(err)
+	}
+
+	amender := &schema.Act{
+		Country: "ua", TypeSlug: "zakon", Year: 2024, Number: "789-1",
+		Expression: &schema.Expression{
+			Title:       "Закон про внесення змін",
+			LangTag:     "uk",
+			VersionDate: time.Date(2024, 3, 1, 0, 0, 0, 0, time.UTC),
+			Amends:      []string{target.ExpressionURI()},
+		},
+	}
+	if err := s.AddAct(amender); err != nil {
+		t.Fatal(err)
+	}
+
+	// Querying by expression URI should also find the amender.
+	got, err := s.InverseAmends(target.ExpressionURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0] != amender.ResourceURI() {
+		t.Errorf("InverseAmends by expression URI = %v, want [%s]", got, amender.ResourceURI())
+	}
+}
+
+func TestInverseAmends_noRelations(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	// Add an act with no amending relationships.
+	act := sampleAct()
+	act.Expression.Amends = nil
+	if err := s.AddAct(act); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := s.InverseAmends(act.ResourceURI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected no amenders, got %v", got)
+	}
+}
+
+// --- GetActs batch tests ---
+
+func TestGetActs_emptySlice(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	got, err := s.GetActs(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 0 {
+		t.Errorf("expected empty result, got %d acts", len(got))
+	}
+}
+
+func TestGetActs_single(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	act := sampleAct()
+	if err := s.AddAct(act); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := s.GetActs([]string{act.ResourceURI()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("expected 1 act, got %d", len(got))
+	}
+	if got[0].ResourceURI() != act.ResourceURI() {
+		t.Errorf("got %s, want %s", got[0].ResourceURI(), act.ResourceURI())
+	}
+}
+
+func TestGetActs_multiple(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	uris := make([]string, 3)
+	for i, num := range []string{"111-1", "222-2", "333-3"} {
+		act := sampleAct()
+		act.Number = num
+		act.IDLocal = num
+		if err := s.AddAct(act); err != nil {
+			t.Fatal(err)
+		}
+		uris[i] = act.ResourceURI()
+	}
+
+	got, err := s.GetActs(uris)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 {
+		t.Fatalf("expected 3 acts, got %d", len(got))
+	}
+	for i, a := range got {
+		if a.ResourceURI() != uris[i] {
+			t.Errorf("act[%d] = %s, want %s", i, a.ResourceURI(), uris[i])
+		}
+	}
+}
+
+func TestGetActs_malformedURI(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	_, err := s.GetActs([]string{"not-a-valid-uri"})
+	if err == nil {
+		t.Error("expected error for malformed URI, got nil")
+	}
+}
+
+func TestGetActs_missingAct(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+	_, err := s.GetActs([]string{schema.ResourceURI("ua", "zakon", 1999, "nonexistent")})
+	if err == nil {
+		t.Error("expected error for missing act, got nil")
+	}
+}
+
+func TestGetActs_duplicateURIs(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	act := sampleAct()
+	if err := s.AddAct(act); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := s.GetActs([]string{act.ResourceURI(), act.ResourceURI()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 {
+		t.Fatalf("expected 2 acts (duplicates allowed), got %d", len(got))
+	}
+}
+
+func TestGetActs_partialFailure(t *testing.T) {
+	s, _ := OpenMemory()
+	defer s.Close()
+
+	act := sampleAct()
+	if err := s.AddAct(act); err != nil {
+		t.Fatal(err)
+	}
+
+	// First URI is valid, second is missing — should return error.
+	_, err := s.GetActs([]string{act.ResourceURI(), schema.ResourceURI("ua", "zakon", 1999, "missing")})
+	if err == nil {
+		t.Error("expected error when any URI is missing, got nil")
+	}
+}
+
 func assertActEqual(t *testing.T, want, got *schema.Act) {
 	t.Helper()
 	if got.Country != want.Country || got.TypeSlug != want.TypeSlug ||

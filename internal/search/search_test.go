@@ -216,7 +216,7 @@ func TestAddAct_nil(t *testing.T) {
 }
 
 func BenchmarkSearch(b *testing.B) {
-	idx, err := OpenMemory()
+	idx, err := OpenMemoryLang("uk")
 	if err != nil {
 		b.Fatal(err)
 	}
