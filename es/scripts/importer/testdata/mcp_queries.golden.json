@@ -71,6 +71,12 @@
         "act_uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945",
         "kind": "title",
         "snippet": "…[Registro]…"
+      },
+      {
+        "uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945/2026-05-27/es/art_df",
+        "act_uri": "https://lex.dev/eli/es/ley/2021/BOE-A-2021-6945",
+        "kind": "article",
+        "snippet": "…[registros]…"
       }
     ]
   }

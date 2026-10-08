@@ -38,6 +38,12 @@
         "act_uri": "https://lex.dev/eli/ch/gesetzbuch/1912/210",
         "kind": "title",
         "snippet": "…[Zivilgesetzbuch]…"
+      },
+      {
+        "uri": "https://lex.dev/eli/ch/gesetzbuch/1912/220/1912-01-01/de",
+        "act_uri": "https://lex.dev/eli/ch/gesetzbuch/1912/220",
+        "kind": "title",
+        "snippet": "…[Zivilgesetzbuches]…"
       }
     ]
   }

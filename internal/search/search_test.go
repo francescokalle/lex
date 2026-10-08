@@ -1,6 +1,7 @@
 package search
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
@@ -211,6 +212,79 @@ func TestAddAct_nil(t *testing.T) {
 	defer idx.Close()
 	if err := idx.AddAct(nil); err == nil {
 		t.Error("expected error for nil act")
+	}
+}
+
+func BenchmarkSearch(b *testing.B) {
+	idx, err := OpenMemory()
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer idx.Close()
+
+	// Index a realistic corpus: 100 acts with 5 articles each.
+	for i := 0; i < 100; i++ {
+		act := &schema.Act{
+			Country: "ua", TypeSlug: "zakon", Year: 2000 + i%20,
+			Number: fmt.Sprintf("%d-%d", 100+i, i%10),
+			Expression: &schema.Expression{
+				Title:       fmt.Sprintf("Закон про зміни до кодексу номер %d", i),
+				LangTag:     "uk",
+				VersionDate: time.Date(2020+i%5, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		for j := 0; j < 5; j++ {
+			act.Expression.Articles = append(act.Expression.Articles, schema.Article{
+				Number: fmt.Sprintf("%d", j+1),
+				Label:  fmt.Sprintf("Стаття %d", j+1),
+				Text:   fmt.Sprintf("Це текст статті %d з кодексу номер %d. Він містить правові норми.", j+1, i),
+			})
+		}
+		if err := idx.AddAct(act); err != nil {
+			b.Fatal(err)
+		}
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		hits, err := idx.Search("кодекс", 10)
+		if err != nil {
+			b.Fatal(err)
+		}
+		if len(hits) == 0 {
+			b.Fatal("expected hits")
+		}
+	}
+}
+
+func BenchmarkAddAct(b *testing.B) {
+	idx, err := OpenMemory()
+	if err != nil {
+		b.Fatal(err)
+	}
+	defer idx.Close()
+
+	act := &schema.Act{
+		Country: "ua", TypeSlug: "zakon", Year: 2024, Number: "123-1",
+		Expression: &schema.Expression{
+			Title:       "Закон про внесення змін до цивільного кодексу",
+			LangTag:     "uk",
+			VersionDate: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+		},
+	}
+	for j := 0; j < 10; j++ {
+		act.Expression.Articles = append(act.Expression.Articles, schema.Article{
+			Number: fmt.Sprintf("%d", j+1),
+			Label:  fmt.Sprintf("Стаття %d", j+1),
+			Text:   fmt.Sprintf("Текст статті %d з важливими правовими нормами та положеннями.", j+1),
+		})
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if err := idx.AddAct(act); err != nil {
+			b.Fatal(err)
+		}
 	}
 }
 
